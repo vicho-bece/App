@@ -1,0 +1,26 @@
+# depslib dependency file v1.0
+1622780834 source:c:\users\vicente\desktop\codeblock\app\list.c
+	<string.h>
+	"list.h"
+
+1622780834 c:\users\vicente\desktop\codeblock\app\list.h
+	<stdlib.h>
+	<stdio.h>
+
+1622780925 source:c:\users\vicente\desktop\codeblock\app\main.c
+	<stdio.h>
+	<stdlib.h>
+	<ctype.h>
+	<string.h>
+	<stdbool.h>
+	<time.h>
+	"Map.h"
+	"list.h"
+
+1622780834 c:\users\vicente\desktop\codeblock\app\map.h
+
+1622780834 source:c:\users\vicente\desktop\codeblock\app\map.c
+	"Map.h"
+	<stdlib.h>
+	<assert.h>
+

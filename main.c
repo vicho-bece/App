@@ -58,12 +58,13 @@ void generarRUTA(Map*, Map*, List*);
 void mejorarRUTA(Map*, Map*, List*);
 void mostrarRUTAS(Map*, List*);
 void cambiar(rutas*, nodos*, best*, int, int);
+void bestWAY(Map*, Map*, List*);
+int cerca(Map*, int[], int[]);
 
-//void bestWAY(Map*, Map*, List*);
 
 int main(void) {
   Map* save = createMap(is_equal_int); //Almacenar los datos...
-  Map* ways = createMap(is_equal_int); //Grafo IMPLICITO
+  Map* ways = createMap(is_equal_int); //Grafo IMPLICITO 
   List* connect = create_list(); //Lista que contempla con el grafo
 
   setSortFunction(save, lower_than_int);
@@ -79,17 +80,17 @@ int main(void) {
       case 1: archivos(save); break;
       case 2: distanciaEntregas(save); break;
       case 3: mejores3(save); break;
-      case 4: crearRUTA(save, ways, connect); break;
-      case 5: generarRUTA(save, ways, connect); break;
+      case 4: crearRUTA(save, ways, connect); break; 
+      case 5: generarRUTA(save, ways, connect); break; 
       case 6: mejorarRUTA(save, ways, connect); break;
       case 7: mostrarRUTAS(ways, connect); break;
-      //case 8: bestWAY(save, ways, connect); break;
+      case 8: bestWAY(save, ways, connect); break;
       default: printf("opción invalida\n"); break;
     }
     menu();
     scanf("%i", &num);
   }
-
+  
   printf("\n Este programa se finalizo. BYE");
   return 0;
 }
@@ -114,14 +115,14 @@ void archivos(Map* save)
   {
     fgetc(archivo);
     coordenadas* lugar = malloc(sizeof(coordenadas));
-
+    
     char x[5];
     char y[5];
     i = 0;
-
+    
 
     lugar->id = cont;
-
+    
     //COORDENADAS X
     while(linea[i] == ' ')
       i++;
@@ -139,7 +140,7 @@ void archivos(Map* save)
 
     for(k = 0; linea[i] != ' ' && linea[i] != '\0'; i++, k++)
       y[k] = linea[i];
-    y[k] = '\0';
+    y[k] = '\0';  
 
     num = conversion(y);
     lugar->coor[1] = num;
@@ -189,7 +190,7 @@ int conversion(char *numero)
 
     return suma;
   }
-
+  
 }
 
 // OPCION 2 | "LISTA"
@@ -213,10 +214,10 @@ void distanciaEntregas(Map* save)
       }
       printf("El id que ingreso (%i) no se encuentra en el almacenamiento. Favor de ingresar otro\n\n ID = ", numID);
     }
-
+  
     coor1[0] = aux->coor[0];
     coor1[1] = aux->coor[1];
-
+  
 
     printf("\n Ahora ingrese el ID de otra entrega\n ID = ");
     while(1)
@@ -229,16 +230,16 @@ void distanciaEntregas(Map* save)
         aux = searchMap(save, &numID);
         if(aux != NULL)
           break;
-
+      
         printf("El id que ingreso (%i) no se encuentra en el almacenamiento. Favor de ingresar otro\n\n ID = ", numID);
       }
     }
-
+  
     coor2[0] = aux->coor[0];
     coor2[1] = aux->coor[1];
 
     int distancia = calculo(coor1, coor2);
-
+  
     printf("\nLa distancia entre la entrega %i y %i es %i[metros] aproximadamente\n", sameID, numID, distancia);
   }
   else
@@ -256,7 +257,7 @@ int calculo(int a[2], int b[2])
   suma = x + y;
 
   while(suma/divisor > divisor)
-    divisor++;
+    divisor++; 
 
   return divisor;
 }
@@ -271,17 +272,17 @@ void mejores3(Map* save)
   printf("Y = ");
   scanf("%i", &user[1]);
   coordenadas* aux = firstMap(save);
-
+  
   if(aux != NULL)
   {
     best datos[48];
     int i;
-
+    
     for(i = 0; i < 48; i++)
     {
       datos[i].id = aux->id;
       datos[i].distancia = calculo(user, aux->coor);
-      aux = nextMap(save);
+      aux = nextMap(save); 
     }
 
     qsort(datos, 48, sizeof(best), compare);
@@ -306,7 +307,7 @@ int compare(const void* a, const void* b)
 }
 
 
-// OPCION 4 | LISTO
+// OPCION 4 | LISTO 
 void crearRUTA(Map* save, Map* ways, List* connect)
 {
   rutas* way = malloc(sizeof(rutas));
@@ -338,7 +339,7 @@ void crearRUTA(Map* save, Map* ways, List* connect)
           scanf("%i", &id);
           aux = searchMap(save, &id);
           if(aux != NULL && repetido(same, id))
-          {
+          { 
             same[0] = id;
             conexion->id[0] = id;
             conexion->distancia[0] = calculo(way->main, aux->coor);
@@ -352,7 +353,7 @@ void crearRUTA(Map* save, Map* ways, List* connect)
 
       restantes(save, same, aux->coor);
       printf("\nIngrese el ID de la entrega numero %i\n\n ID = ", i+1);
-
+    
       while(1)
       {
         scanf("%i", &id);
@@ -378,7 +379,7 @@ void crearRUTA(Map* save, Map* ways, List* connect)
       }
     }
 
-    printf("\nSECUENCIA DE LA RUTA: ");
+    printf("\nSECUENCIA DE LA RUTA: "); 
     for(i = 0; i < 10; i++)
     {
       printf("%i", conexion->id[i]);
@@ -389,11 +390,11 @@ void crearRUTA(Map* save, Map* ways, List* connect)
 
     char name[100];
     printf("\n\nPara finalizar favor de ingresar un nombre a la ruta creada manualmente, evita que el nombre sea repetido.\n\n NOMBRE = ");
-
+  
     getchar();
     scanf("%99[^\n]s", name);
     rutas* find = firstMap(ways);
-
+    
     while(find != NULL)
     {
       if(strcmp(find->nombre, name) == 0)
@@ -461,7 +462,7 @@ void restantes(Map* save, int same[10], int a[2])
   free(disponibles);
 }
 
-// OPCION 5 | LISTO
+// OPCION 5 | LISTO 
 void generarRUTA(Map* save, Map* ways, List* connect)
 {
   rutas* way = malloc(sizeof(rutas));
@@ -495,9 +496,9 @@ void generarRUTA(Map* save, Map* ways, List* connect)
             conexion->distancia[0] = calculo(way->main, aux->coor);
             suma += conexion->distancia[0];
             break;
-          }
+          } 
         }
-
+    
       while(1)
       {
         srand(time(NULL));
@@ -521,7 +522,7 @@ void generarRUTA(Map* save, Map* ways, List* connect)
       }
     }
 
-    printf("\nSECUENCIA DE LA RUTA: ");
+    printf("\nSECUENCIA DE LA RUTA: "); 
     for(i = 0; i < 10; i++)
     {
       printf("%i", conexion->id[i]);
@@ -532,12 +533,12 @@ void generarRUTA(Map* save, Map* ways, List* connect)
 
     char name[100];
     printf("\n\nPara finalizar favor de ingresar un nombre a la ruta creada manualmente, evita que el nombre sea repetido.\n\n NOMBRE = ");
-
+  
     getchar();
     scanf("%99[^\n]s", name);
-
+  
     rutas* find = firstMap(ways);
-
+    
     while(find != NULL)
     {
       if(strcmp(find->nombre, name) == 0)
@@ -566,13 +567,13 @@ void generarRUTA(Map* save, Map* ways, List* connect)
 void mejorarRUTA(Map* save, Map* ways, List* connect){
   rutas* aux = firstMap(ways);
   char nombre_ruta[100];
-
+  
   if(aux != NULL)
   {
     printf("\nIngrese Nombre de la ruta guardada anteriomente\n");
     getchar();
     scanf("%99[^\n]s", nombre_ruta);
-
+    
     while(1)
     {
       if(aux == NULL)
@@ -596,16 +597,16 @@ void mejorarRUTA(Map* save, Map* ways, List* connect){
     printf("\n¿Prefiere buscar la mejor ruta de forma manual o automática?\n");
     printf("\n0 = Manual\n");
     printf("1 = automático\n\n OPCION = ");
-
+    
     int num;
     scanf("%i", &num);
-
+    
     while(num != 0 && num != 1)
     {
       printf("\nLa Opcion que escogio no se encuentra en el listado mencionado. Favor de ingresar otro\n\n OPCION = ");
       scanf("%i", &num);
     }
-
+    
     int num1, num2, indice, indice2, i;
     best* respaldo = malloc(10 * sizeof(best));
 
@@ -695,7 +696,7 @@ void mejorarRUTA(Map* save, Map* ways, List* connect){
           srand(time(NULL));
           num2 = 1 + rand() % 49 - 1;
         }
-
+        
         if(datos->id[i] == num2)
         {
           indice2 = i;
@@ -737,7 +738,7 @@ void mejorarRUTA(Map* save, Map* ways, List* connect){
 
       data = searchMap(save, &respaldo[i].id);
       ant = searchMap(save, &respaldo[i - 1].id);
-
+      
       respaldo[i].distancia = calculo(ant->coor, data->coor);
       suma += respaldo[i].distancia;
 
@@ -767,7 +768,7 @@ void cambiar(rutas* aux, nodos* datos, best* respaldo, int ultimo, int suma)
 {
   aux->last = ultimo;
   aux->total = suma;
-
+  
   int i;
   for(i = 0; i < 10; i++)
   {
@@ -808,44 +809,113 @@ void mostrarRUTAS(Map* ways, List* connect)
     printf("No se creado/generado alguna ruta de entregas\n\n");
 }
 
-// OPCION 8 | PENDIENTE
-/*void bestWAY(Map* save, Map* ways, List* connect)
+// OPCION 8 | LISTO 
+void bestWAY(Map* save, Map* ways, List* connect)
 {
   rutas* way = malloc(sizeof(rutas));
   nodos* conexion = malloc(sizeof(nodos));
+  coordenadas* aux = firstMap(save);
+
+  //Respaldo
+  coordenadas* indice;
+  
 
   int same[10];
   int id, i, suma = 0;
+
 
   printf("\nIngrese sus coordenadas actuales (x,y)\nX = ");
   scanf("%i", &way->main[0]);
   printf("Y = ");
   scanf("%i", &way->main[1]);
 
-  if(save != NULL)
+  if(aux != NULL)
   {
-    for(i = 0; i < 10; i++)
+    for(i = 1; i < 10; i++)
     {
+      if(i == 1)
+      {
+        id = cerca(save, same, way->main);
+        aux = searchMap(save, &id);
+        conexion->distancia[0] = calculo(way->main, aux->coor);
+        conexion->id[0] = aux->id;
+        same[0] = aux->id;
+      }
 
+      
+      
+      indice = searchMap(save, &conexion->id[i - 1]);
+      id = cerca(save, same, indice->coor);
+      aux = searchMap(save, &id); 
+
+      conexion->distancia[i] = calculo(indice->coor, aux->coor);
+      conexion->id[i] = aux->id;
+      suma += conexion->distancia[i];
+      same[i] = aux->id;
+
+      if(i == 9)
+      {
+        way->last = calculo(aux->coor, way->main);
+        suma += way->last;
+      }
     }
+
+    way->total = suma;
+    char name[] = ("RUTA_OPTIMA");
+    
+    way->nombre = strdup(name);
+    conexion->nombre = strdup(name);
+    push_back(connect, conexion);
+    insertMap(ways, &way->total, way);
+
+    printf("\n\nLa Ruta %s se inserto en el almacen de Rutas de forma Exitosa\n\n", name);
+
   }
   else
     printf("\n\nNo hay IDs de entrega almacenados para generar la Mejor Ruta\n\n");
-}*/
+}
 
-void menu(){
+int cerca(Map* save, int same[10], int a[2])
+{
+  coordenadas* aux = firstMap(save);
+  best* almacenado = malloc(48 * sizeof(best));
+  int i, cont = 0;
+
+  for(i = 0; i < 48 && aux != NULL; i++)
+  {
+    while(repetido(same, aux->id) == false)
+    {
+      cont++;
+      aux = nextMap(save);
+      if(aux == NULL) break;
+    }
+    if(aux == NULL) break;
+
+    almacenado[i].id = aux->id;
+    almacenado[i].distancia = calculo(a, aux->coor);
+
+    aux = nextMap(save);
+  }
+
+  almacenado = realloc(almacenado, (48 - cont) * sizeof(best));
+  qsort(almacenado, 48 - cont, sizeof(best),  compare);
+
+  return almacenado[0].id;
+}
+
+void menu(){ 
   printf(" ______________________________________\n");
   printf("|         Bienvenido al Menú de        |\n");
   printf("|           Rutas de entrega           |\n");
   printf("|______________________________________|\n");
-  printf("| 1) Importar coordenadas de entrega   |\n");
-  printf("| 2) Mostrar distancia entre entregas  |\n");
-  printf("| 3) Mostrar 3 rutas mas cercanas      |\n");
-  printf("| 4) Crear ruta                        |\n");
-  printf("| 5) Generar ruta aleatoria            |\n");
-  printf("| 6) Mejorar ruta                      |\n");
-  printf("| 7) Mostrar rutas                     |\n");
-  printf("| 8) Mostrar la ruta mas optima        |\n");
+  printf("| 1) Importar coordenadas de entrega   |\n");   
+  printf("| 2) Mostrar distancia entre entregas  |\n");   
+  printf("| 3) Mostrar 3 Entregas mas cercanas   |\n"); 
+  printf("| 4) Crear Ruta                        |\n"); 
+  printf("| 5) Generar Ruta Aleatoria            |\n");
+  printf("| 6) Mejorar Ruta                      |\n");
+  printf("| 7) Mostrar Rutas                     |\n");
+  printf("| 8) Encontrar Ruta Optima             |\n");
   printf("|______________________________________|\n");
   printf("¿Qué deseas hacer hoy?\n");
 }

@@ -17,15 +17,15 @@ typedef struct{
 typedef struct{
   char* nombre;
   int main[2];
-  int last;
+  int last; //Distancia entre la ultima entrega y su ubicacion...
   int total;
 }rutas;
 
 //Estructura de la LISTA
 typedef struct{
   char* nombre;
-  int id[10];
-  int distancia[10];
+  int id[10]; //Arreglo para los IDs ingresados...
+  int distancia[10]; //Distancia entre los IDs...
 }nodos;
 
 //Estructura auxiliar
@@ -44,6 +44,7 @@ int is_equal_int(void * key1, void * key2) {
   return 0;
 }
 
+//Opciones del menu y funciones apartes...
 void menu();
 void archivos(Map*);
 int conversion(char *);
@@ -67,10 +68,11 @@ int main(void) {
   Map* ways = createMap(is_equal_int); //Grafo IMPLICITO 
   List* connect = create_list(); //Lista que contempla con el grafo
 
-  setSortFunction(save, lower_than_int);
-  setSortFunction(ways, lower_than_int);
+  setSortFunction(save, lower_than_int); //Ordenar por ID
+  setSortFunction(ways, lower_than_int); //Ordenar por Distancia Recorrida total
   menu();
 
+  //El usuario ingresa el numero de la opcion para realizar alguna operacion...
   int num;
   scanf("%i", &num);
   while(num != 0)
@@ -98,6 +100,7 @@ int main(void) {
 // OPCION 1 | "LISTA"
 void archivos(Map* save)
 {
+  //Se lee y se verifica el archivo...
   char csv[1000];
   printf("\nIngrese nombre del archivo\n");
   scanf("%s", csv);
@@ -110,12 +113,16 @@ void archivos(Map* save)
   }
 
   char linea[10];
+
+  //Indices, contador para el ID y una variable auxiliar...
   int i, j, k, num, cont = 1;
+
   while(fscanf(archivo, "%9[^\n]s", linea) != EOF)
   {
     fgetc(archivo);
     coordenadas* lugar = malloc(sizeof(coordenadas));
     
+    //Variables para almacenar la informacion del archivo tipo texto
     char x[5];
     char y[5];
     i = 0;
@@ -162,6 +169,7 @@ int conversion(char *numero)
   int digito, decimas, aux;
   int suma = 0, potencia = -1;
 
+  //Calculo la cantidad de digitos que ocupa el char...
   for(i = 0; numero[i] != '\0'; i++)
     potencia++;
 
@@ -169,16 +177,19 @@ int conversion(char *numero)
 
   if(potencia == 0)
   {
+    //El caso de que el numero sea de un digito...
     digito = numero[0] - 48;
     return digito;
   }
   else
   {
+    //El caso de que el numero sea mayor o igual a 2 digitos..
     for(int k = 0; k < i; k++)
     {
       decimas = 1;
       digito = numero[k] - 48;
 
+      //Ajusto las decimas dependiendo la posicion del string...
       for(;aux > 0; aux--)
         decimas *= 10;
 
@@ -200,9 +211,11 @@ void distanciaEntregas(Map* save)
   int numID, sameID;
   coordenadas* aux = firstMap(save);
 
+  //Pregunta si hay entregas almacenadas...
   if(aux != NULL)
   {
     printf("\nIngrese el ID de una entrega\n ID = ");
+    //El usuario ingresa y verifica el ID de una entrega del almacenamiento...
     while(1)
     {
       scanf("%i", &numID);
@@ -215,11 +228,13 @@ void distanciaEntregas(Map* save)
       printf("El id que ingreso (%i) no se encuentra en el almacenamiento. Favor de ingresar otro\n\n ID = ", numID);
     }
   
+    //Guardo coordenadas...
     coor1[0] = aux->coor[0];
     coor1[1] = aux->coor[1];
   
 
     printf("\n Ahora ingrese el ID de otra entrega\n ID = ");
+    //Ingresa el otro ID de entrega, verifica que esta en el almacenamiento y que no sea el mismo del anterior...
     while(1)
     {
       scanf("%i", &numID);
@@ -235,6 +250,7 @@ void distanciaEntregas(Map* save)
       }
     }
   
+    //Guardo coordenadas...
     coor2[0] = aux->coor[0];
     coor2[1] = aux->coor[1];
 
@@ -252,10 +268,12 @@ int calculo(int a[2], int b[2])
   int x, y, suma;
   int divisor = 1;
 
+  //Calculo la diferencia, le aplico "al cuadrado" y se suma...
   x = b[0] - a[0]; x *= x;
   y = b[1] - a[1]; y *= y;
   suma = x + y;
 
+  //Busco la raiz de la suma...
   while(suma/divisor > divisor)
     divisor++; 
 
@@ -275,9 +293,11 @@ void mejores3(Map* save)
   
   if(aux != NULL)
   {
+    //Estructura aux..
     best datos[48];
     int i;
     
+    //Cada entrega se calcula la distancia con respecto la ubicacion del usuario...
     for(i = 0; i < 48; i++)
     {
       datos[i].id = aux->id;
@@ -285,6 +305,7 @@ void mejores3(Map* save)
       aux = nextMap(save); 
     }
 
+    //Se ordena por QuickSort y muestra las 3 primeras entregas mas cercanas...
     qsort(datos, 48, sizeof(best), compare);
     printf("\nLas 3 Mejores Rutas desde tus coordenadas(%i , %i) son:\n", user[0], user[1]);
 
@@ -295,6 +316,7 @@ void mejores3(Map* save)
     printf("\n No hay coordenadas de entrega registradas...\n");
 }
 
+//Funcion necesaria para el QuickSort...
 int compare(const void* a, const void* b)
 {
   best *ptrA = (best *)a;
@@ -313,6 +335,7 @@ void crearRUTA(Map* save, Map* ways, List* connect)
   rutas* way = malloc(sizeof(rutas));
   nodos* conexion = malloc(sizeof(nodos));
 
+  //Creo un arreglo para evitar que los numeros de ID ingresados sean repetidos...
   int* same = malloc(10 * sizeof(int));
   int id, i, suma = 0;
 
@@ -330,6 +353,7 @@ void crearRUTA(Map* save, Map* ways, List* connect)
 
     for(i = 1; i < 10; i++)
     {
+      //Calculo la distancia desde el usuario y el primer ID entrega, como caso particular...
       if(i == 1)
       {
         restantes(save, same, way->main);
@@ -353,7 +377,8 @@ void crearRUTA(Map* save, Map* ways, List* connect)
 
       restantes(save, same, aux->coor);
       printf("\nIngrese el ID de la entrega numero %i\n\n ID = ", i+1);
-    
+     
+      //Se calculo los IDs de entregas...
       while(1)
       {
         scanf("%i", &id);
@@ -379,6 +404,9 @@ void crearRUTA(Map* save, Map* ways, List* connect)
       }
     }
 
+    /*
+    Se informa al usuario la secuencia de la ruta y la distancia total recorrida...
+    */
     printf("\nSECUENCIA DE LA RUTA: "); 
     for(i = 0; i < 10; i++)
     {
@@ -390,7 +418,8 @@ void crearRUTA(Map* save, Map* ways, List* connect)
 
     char name[100];
     printf("\n\nPara finalizar favor de ingresar un nombre a la ruta creada manualmente, evita que el nombre sea repetido.\n\n NOMBRE = ");
-  
+
+    //Se pide ingresar un nombre particular a la ruta creada...
     getchar();
     scanf("%99[^\n]s", name);
     rutas* find = firstMap(ways);
@@ -408,7 +437,7 @@ void crearRUTA(Map* save, Map* ways, List* connect)
         find = nextMap(ways);
     }
 
-    //free(same);
+    //Se guarda la ultima informacion y se almacena la Lista y Mapa...
 
     way->nombre = strdup(name);
     conexion->nombre = strdup(name);
@@ -421,6 +450,7 @@ void crearRUTA(Map* save, Map* ways, List* connect)
     printf("\n\nNo hay IDs de entregas para crear una ruta personalizada\n\n");
 }
 
+//Verifica si el numero que ingreso el usuario es repetido...
 bool repetido(int a[10], int id)
 {
   int i;
@@ -430,21 +460,25 @@ bool repetido(int a[10], int id)
   return true;
 }
 
+//Muestra las entregas restantes...
 void restantes(Map* save, int same[10], int a[2])
 {
   best* disponibles = malloc(48 * sizeof(best));
   int i, cont = 0;
   coordenadas* aux = firstMap(save);
 
+  /*
+  Durante el ciclo, se imprime la informacion de los IDs y su distancia con respecto a la anterior. Evitando de utilizar/imprimir una entrega utilizada...
+  */
   for(i = 0; i < 48 && aux != NULL; i++)
   {
     while(repetido(same, aux->id) == false)
     {
       cont++;
       aux = nextMap(save);
-      if(aux == NULL) break;
+      if(aux == NULL) break; //Se hace referencia el ultimo dato...
     }
-    if(aux == NULL) break;
+    if(aux == NULL) break; //Break auxiliar...
 
     disponibles[i].id = aux->id;
     disponibles[i].distancia = calculo(a, aux->coor);
@@ -452,6 +486,7 @@ void restantes(Map* save, int same[10], int a[2])
     aux = nextMap(save);
   }
 
+  //Se ajusta con respecto a las entregas utilizadas y se ordena el arreglo de estructuras y se imprimen...
   disponibles = realloc(disponibles, (48 - cont) * sizeof(best));
   qsort(disponibles, (48 - cont), sizeof(best), compare);
   printf("\nENTREGAS RESTANTES\n\n");
@@ -463,6 +498,7 @@ void restantes(Map* save, int same[10], int a[2])
 }
 
 // OPCION 5 | LISTO 
+//El algoritma es muy similar a la funcion 4...
 void generarRUTA(Map* save, Map* ways, List* connect)
 {
   rutas* way = malloc(sizeof(rutas));
@@ -480,12 +516,13 @@ void generarRUTA(Map* save, Map* ways, List* connect)
     scanf("%i", &way->main[0]);
     printf("Y = ");
     scanf("%i", &way->main[1]);
-
+    printf("\nCalculando...\n");
     for(i = 1; i < 10; i++)
     {
       if(i == 1)
         while(1)
         {
+          //Se escoje el numero aleatorio dentro del rango de la entregas almacenadas en total...
           srand(time(NULL));
           id = 1 + rand() % 49 - 1;
           aux = searchMap(save, &id);
@@ -501,6 +538,7 @@ void generarRUTA(Map* save, Map* ways, List* connect)
     
       while(1)
       {
+        //Se escoje otro numero aleatorio y distinto...
         srand(time(NULL));
         id = 1 + rand() % 49 - 1;
         aux = searchMap(save, &id);
@@ -568,12 +606,14 @@ void mejorarRUTA(Map* save, Map* ways, List* connect){
   rutas* aux = firstMap(ways);
   char nombre_ruta[100];
   
+  //Pregunta si hay rutas...
   if(aux != NULL)
   {
     printf("\nIngrese Nombre de la ruta guardada anteriomente\n");
     getchar();
     scanf("%99[^\n]s", nombre_ruta);
     
+    //Se verifica el nombre de la Ruta que desea mejorar...
     while(1)
     {
       if(aux == NULL)
@@ -590,6 +630,7 @@ void mejorarRUTA(Map* save, Map* ways, List* connect){
       aux = nextMap(ways);
     }
 
+    //Se rescata la lista asociado con el Mapa
     nodos* datos = first(connect);
     while(strcmp(datos->nombre, aux->nombre) != 0)
       datos = next(connect);
@@ -598,6 +639,7 @@ void mejorarRUTA(Map* save, Map* ways, List* connect){
     printf("\n0 = Manual\n");
     printf("1 = automático\n\n OPCION = ");
     
+    //El usuario ingresa un de esas 2 opciones y se verifica...
     int num;
     scanf("%i", &num);
     
@@ -608,6 +650,8 @@ void mejorarRUTA(Map* save, Map* ways, List* connect){
     }
     
     int num1, num2, indice, indice2, i;
+
+    //Arreglo similar a la secuencia de la ruta...
     best* respaldo = malloc(10 * sizeof(best));
 
     printf("Estas son la secuencia de entregas de la ruta:\n");
@@ -620,18 +664,21 @@ void mejorarRUTA(Map* save, Map* ways, List* connect){
 
     if(num == 0)
     {
+      //Ingresa el primer ID y verifica que este dentro de la secuencia...
       printf("\n\nIndique 2 IDs de entrega a intercambiar\n");
       printf("Primer ID = ");
       scanf("%i", &num1);
 
       for(i = 0; i < 10; i++)
       {
+        //Encuentra la coincidencia...
         if(num1 == datos->id[i])
         {
           indice = i;
           break;
         }
 
+        //Si no lo encuentra, se pide ingresar otro ID y se reinicia el ciclo...
         if(i == 9)
         {
           printf("\nEl ID que ingreso no se encuentra dentro de la secuencia. Favor de ingresar un numero de la secuencia\n\nPrimer ID = ");
@@ -639,16 +686,21 @@ void mejorarRUTA(Map* save, Map* ways, List* connect){
           i = -1;
         }
       }
+
+      //Ingresa el segundo ID...
       printf("\nSecundo ID = ");
       scanf("%i", &num2);
       for(i = 0; i < 10; i++)
       {
+        //Se asegura que no sea el mismo del anterior...
         while(num2 == num1)
         {
+          //Se obliga a ingresar uno diferente y dentro de la secuencia...
           printf("El ID que ingreso es igual al Primero. Favor de ingresar uno diferente.\n\nSecundo ID = ");
           scanf("%i", &num2);
         }
 
+        //Encuentra coincidencia...
         if(num2 == datos->id[i])
         {
           indice2 = i;
@@ -712,6 +764,7 @@ void mejorarRUTA(Map* save, Map* ways, List* connect){
       }
     }
 
+    //Se el intercambio en el arreglo de respaldo...
     respaldo[indice].id = num2;
     respaldo[indice2].id = num1;
     coordenadas* data;
@@ -724,11 +777,11 @@ void mejorarRUTA(Map* save, Map* ways, List* connect){
 
     int suma = 0, ultimo;
 
-    printf("\n\nPrimer = %i y Secundo = %i\n\n", num1, num2);
     //AQUI SE HACE LOS CALCULOS...
 
     for(i = 1; i < 10; i++)
     {
+      //El calculo entre el usuario y el primer ID...
       if(i == 1)
       {
         data = searchMap(save, &respaldo[0].id);
@@ -736,12 +789,14 @@ void mejorarRUTA(Map* save, Map* ways, List* connect){
         suma += respaldo[0].distancia;
       }
 
+      //Se calculo entre IDs de entrega...
       data = searchMap(save, &respaldo[i].id);
       ant = searchMap(save, &respaldo[i - 1].id);
       
       respaldo[i].distancia = calculo(ant->coor, data->coor);
       suma += respaldo[i].distancia;
 
+      //Ultima entrega y regreso...
       if(i == 9)
       {
         ultimo = calculo(data->coor, aux->main);
@@ -749,13 +804,16 @@ void mejorarRUTA(Map* save, Map* ways, List* connect){
       }
     }
 
+    //Pregunta si la suma de la secuencia propuesta es menor que la anterior....
     if(aux->total > suma)
     {
+      //Se hace las modificaciones...
       printf("\n\nLos IDs de entregas propuestas, mejora en el sentido que reduce la distancia recorrida total. Entonces se realiza el intercambio. Resultado:\n\n Anterior = %i\n\n Propuesto = %i\n\n", aux->total, suma);
       cambiar(aux, datos, respaldo, ultimo, suma);
     }
     else
     {
+      //No se hace las modificaciones...
       free(respaldo);
       printf("\n\nLos IDs de entregas propuestas, automatico/manual, empeora o es igual el resultado con respecto a la distancia recorrido total, el cual no se hace la modificacion a la ruta. Resultado:\n\n Anterior = %i\n\n Propuesto = %i\n\n", aux->total, suma);
     }
@@ -764,6 +822,7 @@ void mejorarRUTA(Map* save, Map* ways, List* connect){
     printf("\nNo hay rutas almacenadas para realizar una mejora\n");
 }
 
+//Modifica los datos del mapa y se cambia por completo la secuencia(por seguridad)
 void cambiar(rutas* aux, nodos* datos, best* respaldo, int ultimo, int suma)
 {
   aux->last = ultimo;
@@ -777,21 +836,24 @@ void cambiar(rutas* aux, nodos* datos, best* respaldo, int ultimo, int suma)
   }
 }
 
-// OPCION 7 | Listo por el momento
+// OPCION 7 | LISTO
 void mostrarRUTAS(Map* ways, List* connect)
 {
   rutas* aux = firstMap(ways);
   nodos* data;
   int i;
 
+  //Pregunta si hay rutas...
   if(aux != NULL)
   {
+    //Va por orden del mapa
     printf("\nNOMBRE | RUTA | DISTANCIA TOTAL RECORRIDA\n\n");
     while(aux != NULL)
     {
       printf("%s  ", aux->nombre);
-      data = first(connect);
 
+      //Busca la lista asociado con el nombre...
+      data = first(connect);
       while(strcmp(data->nombre, aux->nombre) != 0)
         data = next(connect);
 
@@ -819,7 +881,7 @@ void bestWAY(Map* save, Map* ways, List* connect)
   //Respaldo
   coordenadas* indice;
   
-
+  //Arreglo para evitar IDs repetidos que interfieren con el resultado...
   int same[10];
   int id, i, suma = 0;
 
@@ -829,22 +891,27 @@ void bestWAY(Map* save, Map* ways, List* connect)
   printf("Y = ");
   scanf("%i", &way->main[1]);
 
+  //Pregunta si hay coordenadas...
   if(aux != NULL)
   {
     for(i = 1; i < 10; i++)
     {
       if(i == 1)
       {
+        //Busco el ID mas cercano al usuario...
         id = cerca(save, same, way->main);
         aux = searchMap(save, &id);
         conexion->distancia[0] = calculo(way->main, aux->coor);
         conexion->id[0] = aux->id;
+
+        //Guardo el ID usado...
         same[0] = aux->id;
       }
 
       
-      
+      //Obtengo los datos del ultimo ID...
       indice = searchMap(save, &conexion->id[i - 1]);
+      //Busco el ID mas cercano con respecto al ultimo ID ingresado...
       id = cerca(save, same, indice->coor);
       aux = searchMap(save, &id); 
 
@@ -853,6 +920,7 @@ void bestWAY(Map* save, Map* ways, List* connect)
       suma += conexion->distancia[i];
       same[i] = aux->id;
 
+      //Ultima entregra y regreso...
       if(i == 9)
       {
         way->last = calculo(aux->coor, way->main);
@@ -875,6 +943,7 @@ void bestWAY(Map* save, Map* ways, List* connect)
     printf("\n\nNo hay IDs de entrega almacenados para generar la Mejor Ruta\n\n");
 }
 
+//Funcion similar al "mejores3"...
 int cerca(Map* save, int same[10], int a[2])
 {
   coordenadas* aux = firstMap(save);
@@ -900,9 +969,11 @@ int cerca(Map* save, int same[10], int a[2])
   almacenado = realloc(almacenado, (48 - cont) * sizeof(best));
   qsort(almacenado, 48 - cont, sizeof(best),  compare);
 
+  //Se retorne el primer dato a partir del QuickSort...
   return almacenado[0].id;
 }
 
+//Menú/Interfaz...
 void menu(){ 
   printf(" ______________________________________\n");
   printf("|         Bienvenido al Menú de        |\n");

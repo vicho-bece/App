@@ -8,6 +8,7 @@ Es recomendable revisar esta tarea en Repl.it, ya que la funcion qsort en CodeBl
 **PROBLEMAS CONOCIDOS...**
 
 * El mapa de las rutas no admiten 2 rutas con la misma distancia total recorrida, cuyo dato es la "key" del mapa.
+* La "RUTA_OPTIMA" si hay mas de una mostrar la misma secuencia de la primera "RUTA_OPTIMA" que se genero.
 
 **ACLARACIONES...**
 
